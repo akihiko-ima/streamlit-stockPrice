@@ -8,6 +8,13 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import plotly.io as pio
 
+st.set_page_config(
+    page_title="Stock-AKI",
+    page_icon=":gorilla:",
+    layout="wide",
+    initial_sidebar_state="expanded",
+)
+
 st.title("StockPrice-Viewer")
 
 
@@ -30,7 +37,7 @@ def get_data(days, tickers):
 # tryを使用することで、エラー発生時のコメント表示が可能
 try:
     # st.write("#### ■表示日数選択")
-    days = st.sidebar.slider(":calendar: Days", 1, 2000, 500)
+    days = st.sidebar.slider(":calendar: Days", 1, 5000, 365)
     # st.write(f"#### 過去 **{days}日間**の株価")
 
     st.write("#### Company Selection")
@@ -41,6 +48,8 @@ try:
     tickers = {
         "KO": "KO",
         "Carnival": "CCL",
+        "TSMC": "TSM",
+        "MongoDB": "MDB",
         "Crowdstrike": "CRWD",
         "Microsoft": "MSFT",
         "ETF VTI": "VTI",
@@ -52,7 +61,7 @@ try:
     companies = st.multiselect(
         "Company Selection",
         list(df.index),
-        ["KO", "Microsoft", "ETF VTI", "ETF VT"],  # ko, MSFT, VTI, VTを初期表示
+        ["KO", "TSMC", "MongoDB", "Microsoft", "ETF VT"],
     )
     if not companies:
         st.error("一社は選択する")
@@ -83,19 +92,13 @@ try:
 
         fig1.update_layout(height=700, width=950)
         fig1.update_layout(
-            title=dict(
-                text="<b>StockPrice_Chart",
-                font=dict(size=20, color="grey"),
-                x=0.45,
-                xanchor="center",
-            ),
             hovermode="x",  # hervermode: x 複数参照、 closest　一番近い点
             legend=dict(
-                xanchor="right",
-                yanchor="bottom",
-                x=1.25,
-                y=0.35,
-                orientation="v",
+                xanchor="left",
+                yanchor="top",
+                x=0.1,
+                y=1.1,
+                orientation="h",
                 bgcolor="white",
                 bordercolor="grey",
                 borderwidth=1,
