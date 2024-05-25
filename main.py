@@ -3,6 +3,7 @@
 import pandas as pd
 import yfinance as yf
 import streamlit as st
+import time
 import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
@@ -16,6 +17,13 @@ st.set_page_config(
 )
 
 st.title("StockPrice-Viewer")
+
+toast_flag = False
+if "toast_flag" not in st.session_state:
+    st.toast(":violet-background[このページはCookiesを使用しています]", icon="🚨")
+    time.sleep(1.5)
+    st.session_state["toast_flag"] = True
+
 controller = CookieController()
 
 
