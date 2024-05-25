@@ -6,7 +6,7 @@ import streamlit as st
 import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
-import plotly.io as pio
+from streamlit_cookies_controller import CookieController
 
 st.set_page_config(
     page_title="Stock-AKI",
@@ -16,9 +16,9 @@ st.set_page_config(
 )
 
 st.title("StockPrice-Viewer")
+controller = CookieController()
 
 
-# キャッシュを貯めるコマンド。次回以降の検索速度が工場
 @st.cache_data
 def get_data(days, tickers):
     df = pd.DataFrame()
@@ -34,11 +34,21 @@ def get_data(days, tickers):
     return df
 
 
-# tryを使用することで、エラー発生時のコメント表示が可能
+# cookiesの取得
+cookies = controller.getAll()
+
 try:
-    # st.write("#### ■表示日数選択")
-    days = st.sidebar.slider(":calendar: Days", 1, 5000, 365)
-    # st.write(f"#### 過去 **{days}日間**の株価")
+    if (
+        cookies is None
+        or "stock_price_days" not in cookies
+        or cookies["stock_price_days"] is None
+    ):
+        days = st.sidebar.slider(":calendar: Days", 1, 5000, 365)
+        controller.set("stock_price_days", days)
+    else:
+        days = cookies["stock_price_days"]
+        days = st.sidebar.slider(":calendar: Days", 1, 5000, days)
+        controller.set("stock_price_days", days)
 
     st.write("#### Company Selection")
     ymin, ymax = st.sidebar.slider(
