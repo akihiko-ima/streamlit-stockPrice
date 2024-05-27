@@ -1,4 +1,9 @@
 # 環境設定ファイル
 .env
 
+# for python
+__pycache__/
+*.py[cod]
+
+
 temp/
