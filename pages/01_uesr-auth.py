@@ -2,6 +2,17 @@ import streamlit as st
 import pandas as pd
 from utils.auth import Login_authentication
 
+st.markdown(
+    """
+    <style>
+    .main .block-container {
+        padding-top: 3rem;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
 # ユーザー名とパスワードの入力フォーム
 st.title("ログイン画面")
 

@@ -15,7 +15,18 @@ st.set_page_config(
     page_title="Stock-AKI",
     page_icon=":gorilla:",
     layout="wide",
-    initial_sidebar_state="expanded",
+    initial_sidebar_state="collapsed",
+)
+
+st.markdown(
+    """
+    <style>
+    .main .block-container {
+        padding-top: 3rem;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
 )
 
 # セッション状態の初期化
