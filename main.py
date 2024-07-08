@@ -47,12 +47,11 @@ if "toast_flag" not in st.session_state:
 controller = CookieController()
 
 
-@st.cache_data
-def get_data(days, tickers):
+def get_data(period, tickers):
     df = pd.DataFrame()
     for company in tickers.keys():
         tkr = yf.Ticker(tickers[company])
-        hist = tkr.history(period=f"{days}d")
+        hist = tkr.history(period=period)
         hist.index = hist.index.strftime("%d %B %Y")
         hist = hist[["Close"]]
         hist.columns = [company]
@@ -67,18 +66,37 @@ with tab1:
     # cookiesの取得
     cookies = controller.getAll()
 
+    # サイドバーで期間を選択できるようにする
+    period_options = [
+        "1d",
+        "5d",
+        "1mo",
+        "3mo",
+        "6mo",
+        "1y",
+        "2y",
+        "5y",
+        "10y",
+        "ytd",
+        "max",
+    ]
+
     try:
         if (
             cookies is None
-            or "stock_price_days" not in cookies
-            or cookies["stock_price_days"] is None
+            or "stock_price_period" not in cookies
+            or cookies["stock_price_period"] is None
         ):
-            days = st.sidebar.slider(":calendar: Days", 1, 5000, 365)
-            controller.set("stock_price_days", days)
+            period = st.sidebar.selectbox(
+                ":calendar: Period", period_options, index=period_options.index("1y")
+            )
+            controller.set("stock_price_period", period)
         else:
-            days = cookies["stock_price_days"]
-            days = st.sidebar.slider(":calendar: Days", 1, 5000, days)
-            controller.set("stock_price_days", days)
+            period = cookies["stock_price_period"]
+            period = st.sidebar.selectbox(
+                ":calendar: Period", period_options, index=period_options.index(period)
+            )
+            controller.set("stock_price_period", period)
 
         st.write("#### Company Selection")
         ymin, ymax = st.sidebar.slider(
@@ -96,7 +114,7 @@ with tab1:
             "ETF VT": "VT",
         }
 
-        df = get_data(days, tickers)
+        df = get_data(period, tickers)
 
         companies = st.multiselect(
             "Company Selection",
@@ -152,7 +170,7 @@ with tab1:
 with tab2:
     if st.session_state["login_auth"] == True:
         st.write("secret page")
-        predict_df = get_data(days, tickers)
+        predict_df = get_data(period, tickers)
 
         st.write("#### choice target")
         predict_taeget_companies = st.selectbox(
