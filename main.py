@@ -15,7 +15,7 @@ st.set_page_config(
     page_title="Stock-AKI",
     page_icon=":gorilla:",
     layout="wide",
-    initial_sidebar_state="collapsed",
+    initial_sidebar_state="auto",
 )
 
 st.markdown(
@@ -33,7 +33,23 @@ st.markdown(
 if "login_auth" not in st.session_state:
     st.session_state["login_auth"] = False
 
+# sidebar-component
+sidebar_logo_path = "./media/sidebar-icon-stockPrice.png"
+main_logo_path = "./media/main-stock_prediction_analysis_icon.png"
+st.logo(sidebar_logo_path, icon_image=main_logo_path)
+st.markdown(
+    """
+    <style>
+    img[data-testid="stLogo"] {
+                height: 3rem;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
 
+
+# main-component
 st.title("StockPrice-Viewer")
 
 tab1, tab2 = st.tabs(["📈 view", "🗃 predict_Function"])
