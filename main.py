@@ -109,75 +109,88 @@ with tab1:
         "max",
     ]
 
-    try:
-        if cookies is None or cookies["stock_price_period"] is None:
-            period = st.sidebar.selectbox(
-                ":calendar: Period", period_options, index=period_options.index("1y")
-            )
-            controller.set("stock_price_period", period)
-        else:
-            period = cookies["stock_price_period"]
-            period = st.sidebar.selectbox(
-                ":calendar: Period", period_options, index=period_options.index(period)
-            )
-            controller.set("stock_price_period", period)
+    # try:
+    #     cookies["stock_price_period"]
+    #     period = st.sidebar.selectbox(
+    #         ":calendar: Period", period_options, index=period_options.index("1y")
+    #     )
+    #     controller.set("stock_price_period", period)
+    #     if cookies["stock_price_period"]:
+    #         period = cookies["stock_price_period"]
+    #         period = st.sidebar.selectbox(
+    #             ":calendar: Period", period_options, index=period_options.index(period)
+    #         )
 
-        st.write("#### Company Selection")
-        ymin, ymax = st.sidebar.slider(
-            ":chart_with_upwards_trend: Scale ", 0, 3000, (0, 500)
+    if (
+        cookies is None
+        or "stock_price_period" not in cookies
+        or cookies["stock_price_period"] is None
+    ):
+        period = st.sidebar.selectbox(
+            ":calendar: Period", period_options, index=period_options.index("1y")
+        )
+    else:
+        period = cookies["stock_price_period"]
+        period = st.sidebar.selectbox(
+            ":calendar: Period", period_options, index=period_options.index(period)
         )
 
-        if cookies["ticker_list"] is None:
-            ticker_list = ["VT", "VTI", "VEA", "VWO", "KO", "TSM"]
-        else:
-            ticker_list = cookies["ticker_list"]
+    st.write("#### Company Selection")
+    ymin, ymax = st.sidebar.slider(
+        ":chart_with_upwards_trend: Scale ", 0, 3000, (0, 500)
+    )
 
-        df = get_stock_data(ticker_list, period)
+    if "ticker_list" in cookies and cookies["ticker_list"] is not None:
+        ticker_list = cookies["ticker_list"]
+    else:
+        ticker_list = ["VT", "VTI", "VEA", "VWO", "KO", "TSM"]
 
-        companies = st.multiselect(
-            "Company Selection",
-            list(df.index),
-            ticker_list[:3],
+    df = get_stock_data(ticker_list, period)
+
+    companies = st.multiselect(
+        "Company Selection",
+        list(df.index),
+        ticker_list[:3],
+    )
+    if not companies:
+        st.error("一社は選択する")
+    else:
+        data = df.loc[companies]
+        st.write("#### StockPrice(USD)", data)
+        df = df.T.reset_index()
+        fig1 = make_subplots(rows=1, cols=1)
+
+    for company in companies:
+        fig1.add_trace(
+            go.Scatter(x=df["Date"], y=df[company], name=f"{company}"), row=1, col=1
         )
-        if not companies:
-            st.error("一社は選択する")
-        else:
-            data = df.loc[companies]
-            st.write("#### StockPrice(USD)", data)
-            df = df.T.reset_index()
-            fig1 = make_subplots(rows=1, cols=1)
+        fig1.update_yaxes(
+            title_text="StockPrice [$]",
+            title_font={"size": 20},
+            title_standoff=0,
+            range=[ymin, ymax],
+            row=1,
+            col=1,
+        )
 
-        for company in companies:
-            fig1.add_trace(
-                go.Scatter(x=df["Date"], y=df[company], name=f"{company}"), row=1, col=1
-            )
-            fig1.update_yaxes(
-                title_text="StockPrice [$]",
-                title_font={"size": 20},
-                title_standoff=0,
-                range=[ymin, ymax],
-                row=1,
-                col=1,
-            )
+        fig1.update_layout(height=700, width=950)
+        fig1.update_layout(
+            hovermode="x",  # hervermode: x 複数参照、 closest　一番近い点
+            legend=dict(
+                xanchor="left",
+                yanchor="top",
+                x=0.1,
+                y=1.1,
+                orientation="h",
+                bgcolor="white",
+                bordercolor="grey",
+                borderwidth=1,
+            ),
+        )
+    st.plotly_chart(fig1, use_container_width=True)
 
-            fig1.update_layout(height=700, width=950)
-            fig1.update_layout(
-                hovermode="x",  # hervermode: x 複数参照、 closest　一番近い点
-                legend=dict(
-                    xanchor="left",
-                    yanchor="top",
-                    x=0.1,
-                    y=1.1,
-                    orientation="h",
-                    bgcolor="white",
-                    bordercolor="grey",
-                    borderwidth=1,
-                ),
-            )
-        st.plotly_chart(fig1, use_container_width=True)
-
-    except:
-        st.error("エラーが起きました。")
+    # set-cookie
+    controller.set("stock_price_period", period)
 
 with tab2:
     if st.session_state["login_auth"] == True:
