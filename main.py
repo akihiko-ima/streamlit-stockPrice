@@ -10,6 +10,8 @@ from plotly.subplots import make_subplots
 from streamlit_cookies_controller import CookieController
 from prophet import Prophet
 from prophet.plot import plot_plotly
+from typing import List
+
 
 st.set_page_config(
     page_title="Stock-AKI",
@@ -63,17 +65,27 @@ if "toast_flag" not in st.session_state:
 controller = CookieController()
 
 
-def get_data(period, tickers):
+@st.cache_data
+def get_stock_data(ticker_list: List[str], period: str = "1y") -> pd.DataFrame:
     df = pd.DataFrame()
-    for company in tickers.keys():
-        tkr = yf.Ticker(tickers[company])
-        hist = tkr.history(period=period)
-        hist.index = hist.index.strftime("%d %B %Y")
-        hist = hist[["Close"]]
-        hist.columns = [company]
-        hist = hist.T
-        hist.index.name = "Name"
-        df = pd.concat([df, hist])
+
+    for ticker in ticker_list:
+        try:
+            tkr = yf.Ticker(ticker)
+            hist = tkr.history(period=period)
+            if hist.empty:
+                st.warning(f"No data for {ticker}, skipping...")
+                continue
+            hist.index = hist.index.strftime("%d %B %Y")
+            hist = hist[["Close"]]
+            hist.columns = [ticker]
+            hist = hist.T
+            hist.index.name = "Name"
+            df = pd.concat([df, hist])
+        except Exception as e:
+            st.error(f"Error retrieving data for {ticker}: {e}")
+            pass
+
     return df
 
 
@@ -98,11 +110,7 @@ with tab1:
     ]
 
     try:
-        if (
-            cookies is None
-            or "stock_price_period" not in cookies
-            or cookies["stock_price_period"] is None
-        ):
+        if cookies is None or cookies["stock_price_period"] is None:
             period = st.sidebar.selectbox(
                 ":calendar: Period", period_options, index=period_options.index("1y")
             )
@@ -119,38 +127,26 @@ with tab1:
             ":chart_with_upwards_trend: Scale ", 0, 3000, (0, 500)
         )
 
-        tickers = {
-            "KO": "KO",
-            "Carnival": "CCL",
-            "TSMC": "TSM",
-            "MongoDB": "MDB",
-            "Crowdstrike": "CRWD",
-            "Microsoft": "MSFT",
-            "ETF VTI": "VTI",
-            "ETF VT": "VT",
-        }
+        if cookies["ticker_list"] is None:
+            ticker_list = ["VT", "VTI", "VEA", "VWO", "KO", "TSM"]
+        else:
+            ticker_list = cookies["ticker_list"]
 
-        df = get_data(period, tickers)
+        df = get_stock_data(ticker_list, period)
 
         companies = st.multiselect(
             "Company Selection",
             list(df.index),
-            ["KO", "TSMC", "MongoDB", "Microsoft", "ETF VT"],
+            ticker_list[:3],
         )
         if not companies:
             st.error("一社は選択する")
         else:
             data = df.loc[companies]
-            st.write("#### StockPrice(USD)", data.sort_index())
-            # yfinanceから読み取ったデータフレームのインデックスがずれているのでreset実施
-            data = data.T.reset_index()
-            data = pd.melt(data, id_vars=["Date"]).rename(
-                columns={"value": "Stock Prices(USD)"}
-            )
+            st.write("#### StockPrice(USD)", data)
             df = df.T.reset_index()
             fig1 = make_subplots(rows=1, cols=1)
 
-        # for company in tickers.keys():
         for company in companies:
             fig1.add_trace(
                 go.Scatter(x=df["Date"], y=df[company], name=f"{company}"), row=1, col=1
@@ -186,7 +182,7 @@ with tab1:
 with tab2:
     if st.session_state["login_auth"] == True:
         st.write("secret page")
-        predict_df = get_data(period, tickers)
+        predict_df = get_stock_data(ticker_list, period)
 
         st.write("#### choice target")
         predict_taeget_companies = st.selectbox(
