@@ -1,9 +1,12 @@
 # 環境設定ファイル
 .env
 
+# dir
+env_st_stock
+temp/
+
 # for python
+__pycache__
 __pycache__/
 *.py[cod]
 
-
-temp/

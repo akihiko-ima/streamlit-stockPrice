@@ -12,9 +12,6 @@ load_dotenv()
 CONTACT_API_ENDPOINT = os.getenv("CONTACT_API_ENDPOINT")
 
 
-st.set_page_config(layout="wide")
-
-
 def submit_form(
     name: str, email: str, body: str, from_site: str = "streamlit"
 ) -> Dict[str, Any]:
@@ -49,13 +46,12 @@ with col2:
         '<p style="font-size: 13px;">*Required fields</p>', unsafe_allow_html=True
     )
 
-    if st.button("Send", type="primary"):
+    if st.button("Send", type="primary", icon=":material/send:"):
         if not name or not email or not body:
             st.error("Please fill out all required fields.")
         else:
             try:
                 valid = validate_email(email, check_deliverability=True)
-
                 response: Dict[str, Any] = submit_form(name, email, body)
 
                 if response["message"] == "success!":

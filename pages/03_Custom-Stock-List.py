@@ -1,20 +1,9 @@
 import streamlit as st
-from streamlit_cookies_controller import CookieController
 import toml
+from streamlit_cookies_controller import CookieController
 
 # ユーザー名とパスワードの入力フォーム
 st.header("Setting-Stock-List", divider="blue")
-
-st.markdown(
-    """
-    <style>
-    .main .block-container {
-        padding-top: 3rem;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
 
 # use cookie
 controller = CookieController()
@@ -22,10 +11,9 @@ controller = CookieController()
 if "ticker_list" not in st.session_state:
     st.session_state["ticker_list"] = []
 
-# st.write("st.session_state object:", st.session_state)
+tick = st.text_input("Enter in your favorite Tick", placeholder="e.g. KO, MS, MSFT")
 
-tick = st.text_input("Enter in your favorite Tick")
-if st.button("Add List", key="Add_tick_to_List"):
+if st.button("Add List", key="Add_tick_to_List", type="primary", icon=":material/add:"):
     if not tick:
         st.error("Enter in your favorite Tick")
     else:

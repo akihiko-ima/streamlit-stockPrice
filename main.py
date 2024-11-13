@@ -14,21 +14,9 @@ from typing import List
 
 
 st.set_page_config(
-    page_title="Stock-AKI",
+    page_title="Stock-imaima",
     page_icon=":gorilla:",
-    layout="wide",
     initial_sidebar_state="auto",
-)
-
-st.markdown(
-    """
-    <style>
-    .main .block-container {
-        padding-top: 3rem;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True,
 )
 
 # セッション状態の初期化
@@ -50,25 +38,23 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-
 # main-component
-st.title("StockPrice-Viewer")
-
+st.header("StockPrice-Viewer", divider="blue")
 tab1, tab2 = st.tabs(["📈 view", "🗃 predict_Function"])
 
 toast_flag = False
 if "toast_flag" not in st.session_state:
     st.toast(":violet-background[このページはCookiesを使用しています]", icon="🚨")
-    time.sleep(1.5)
+    time.sleep(2.5)
     st.session_state["toast_flag"] = True
 
+# cookie用のコントローラー
 controller = CookieController()
 
 
 @st.cache_data
 def get_stock_data(ticker_list: List[str], period: str = "1y") -> pd.DataFrame:
     df = pd.DataFrame()
-
     for ticker in ticker_list:
         try:
             tkr = yf.Ticker(ticker)
@@ -85,15 +71,12 @@ def get_stock_data(ticker_list: List[str], period: str = "1y") -> pd.DataFrame:
         except Exception as e:
             st.error(f"Error retrieving data for {ticker}: {e}")
             pass
-
     return df
 
 
 with tab1:
-
     # cookiesの取得
     cookies = controller.getAll()
-
     # サイドバーで期間を選択できるようにする
     period_options = [
         "1d",
@@ -108,18 +91,6 @@ with tab1:
         "ytd",
         "max",
     ]
-
-    # try:
-    #     cookies["stock_price_period"]
-    #     period = st.sidebar.selectbox(
-    #         ":calendar: Period", period_options, index=period_options.index("1y")
-    #     )
-    #     controller.set("stock_price_period", period)
-    #     if cookies["stock_price_period"]:
-    #         period = cookies["stock_price_period"]
-    #         period = st.sidebar.selectbox(
-    #             ":calendar: Period", period_options, index=period_options.index(period)
-    #         )
 
     if (
         cookies is None
@@ -153,7 +124,7 @@ with tab1:
         ticker_list[:3],
     )
     if not companies:
-        st.error("一社は選択する")
+        st.error("一社は選択してください。")
     else:
         data = df.loc[companies]
         st.write("#### StockPrice(USD)", data)
