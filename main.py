@@ -4,6 +4,7 @@ import streamlit as st
 
 from components.sidebar import sidebar_component
 from views import (
+    qrcode_page,
     us_stock_page,
     japan_stock_page,
     login_page,
@@ -40,6 +41,9 @@ if tabs == "Login":
 
 if tabs == "Settings":
     custom_stock_list_page()
+
+if tabs == "QR":
+    qrcode_page()
 
 if tabs == "Contact":
     contact_me_page()

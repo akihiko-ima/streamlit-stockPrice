@@ -5,8 +5,15 @@ from st_on_hover_tabs import on_hover_tabs
 def sidebar_component():
     with st.sidebar:
         tabs = on_hover_tabs(
-            tabName=["main", "JapanStock", "Login", "Settings", "Contact"],
-            iconName=["home", "radio_button_checked", "login", "settings", "send"],
+            tabName=["main", "JapanStock", "Login", "Settings", "QR", "Contact"],
+            iconName=[
+                "home",
+                "radio_button_checked",
+                "login",
+                "settings",
+                "qr_code",
+                "send",
+            ],
             styles={
                 "navtab": {
                     "background-color": "#111",
