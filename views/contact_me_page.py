@@ -3,12 +3,12 @@ import time
 from typing import Dict, Any
 from email_validator import validate_email, EmailNotValidError
 
-from services.submit_form import submit_form
+from services.submit_form import submit_contact_form_data
 
 
-def contact_me_page():
+def contact_me_page() -> None:
+    """Renders a contact form in a Streamlit application."""
     col1, col2, col3 = st.columns([0.25, 3, 0.25])
-    ## Contact form
     with col2:
         st.header("✉️ Contact Me")
         name = st.text_input(
@@ -31,7 +31,9 @@ def contact_me_page():
             else:
                 try:
                     valid = validate_email(email, check_deliverability=True)
-                    response: Dict[str, Any] = submit_form(name, email, body)
+                    response: Dict[str, Any] = submit_contact_form_data(
+                        name, email, body
+                    )
 
                     if response["message"] == "success!":
                         st.toast("""success!""", icon="✅")

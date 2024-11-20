@@ -10,8 +10,8 @@ from prophet.plot import plot_plotly
 from typing import List
 
 
-def us_stock_page():
-    # cookie用のコントローラー
+def us_stock_page() -> None:
+    """Renders a USA stock prices in a Streamlit application."""
     controller = CookieController()
     st.header("StockPrice-Viewer", divider="blue")
     tab1, tab2 = st.tabs(["📈 view", "🗃 predict_Function"])
@@ -24,6 +24,19 @@ def us_stock_page():
 
     @st.cache_data
     def get_stock_data(ticker_list: List[str], period: str = "1y") -> pd.DataFrame:
+        """
+        Fetches historical stock data for a list of tickers and returns a formatted DataFrame.
+
+        Args:
+            ticker_list (List[str]): A list of stock ticker symbols to fetch data for.
+            period (str, optional): The period for which historical data is fetched.
+                                    Defaults to "1y". Examples include "1d", "5d", "1mo",
+                                    "6mo", "1y", "5y", "max".
+
+        Returns:
+            pd.DataFrame:A DataFrame containing the historical closing prices of the
+                      specified tickers, with tickers as row indices and dates as columns.
+        """
         df = pd.DataFrame()
         for ticker in ticker_list:
             try:

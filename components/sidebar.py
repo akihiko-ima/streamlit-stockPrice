@@ -2,7 +2,17 @@ import streamlit as st
 from st_on_hover_tabs import on_hover_tabs
 
 
-def sidebar_component():
+def sidebar_component() -> str:
+    """
+    Creates a custom sidebar component in a Streamlit application using `st_on_hover_tabs`.
+
+    The sidebar includes multiple tabs with specific icons and styles for navigation.
+    The tabs are defined by their names and associated icons, and custom styles are
+    applied to the navigation and tab elements.
+
+    Returns:
+        str: The name of the currently selected tab.
+    """
     with st.sidebar:
         tabs = on_hover_tabs(
             tabName=["main", "JapanStock", "Login", "Settings", "QR", "Contact"],

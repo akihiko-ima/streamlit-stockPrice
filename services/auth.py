@@ -10,6 +10,18 @@ load_dotenv()
 
 
 def get_user_df() -> pd.DataFrame:
+    """
+    Retrieves data from a Google Sheets document and returns it as a pandas DataFrame.
+
+    Raises:
+        ValueError: If the environment variable `GOOGLE_APPLICATION_CREDENTIALS_JSON`
+                    is not set or invalid.
+
+    Returns:
+        pd.DataFrame: A pandas DataFrame containing the data from the specified
+                      Google Sheets document. The first row of the sheet is used
+                      as the column headers, and subsequent rows form the data.
+    """
     creds_json_str = os.getenv("GOOGLE_APPLICATION_CREDENTIALS_JSON")
     if creds_json_str is None:
         raise ValueError("GOOGLE_APPLICATION_CREDENTIALS_JSON not found in .env file")
@@ -32,6 +44,20 @@ def get_user_df() -> pd.DataFrame:
 
 
 def Login_authentication(target_name: str, valid_pasword: str) -> Union[bool, str]:
+    """
+    Authenticates a user by verifying the username and password against data
+    retrieved from a Google Sheets document.
+
+    Args:
+        target_name (str): The username to authenticate.
+        valid_pasword (str): The password to validate against the username.
+
+    Returns:
+        Union[bool, str]: Returns `True` if the username and password match
+                          the record in the data. Returns an error message as a string
+                          if the username is not unique, does not exist, or the password
+                          is incorrect.
+    """
     user_df = get_user_df()
 
     # user確認

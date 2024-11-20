@@ -5,7 +5,8 @@ import plotly.graph_objects as go
 import jaconv
 
 
-def japan_stock_page():
+def japan_stock_page() -> None:
+    """Renders a Japan stock prices in a Streamlit application."""
     st.header("Japan stock", divider="blue")
 
     ticker = st.text_input("ティッカーコードを入力してください（例：7203）")

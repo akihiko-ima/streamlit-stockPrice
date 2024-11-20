@@ -3,7 +3,8 @@ import toml
 from streamlit_cookies_controller import CookieController
 
 
-def custom_stock_list_page():
+def custom_stock_list_page() -> None:
+    """Renders a Create a list of stock prices in a Streamlit application."""
     st.header("Setting-Stock-List", divider="blue")
 
     controller = CookieController()

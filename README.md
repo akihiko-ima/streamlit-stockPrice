@@ -12,9 +12,13 @@
   pip install -r requirements.txt<br>
   pip freeze > requirements.txt
 
+#### Icon for sidebar
+
+- Google Fonts => [https://fonts.google.com/icons](https://fonts.google.com/icons)
+
 #### アプリの実行
 
-- streamlit run main.py
+- streamlit run app.py
 
 ## <div align="center">streamlit-cloud で公開中 🚀 NEW</div>
 

@@ -3,8 +3,8 @@ import streamlit as st
 from services.auth import Login_authentication
 
 
-def login_page():
-    # ユーザー名とパスワードの入力フォーム
+def login_page() -> None:
+    """Renders a login form in a Streamlit application."""
     st.header("Login", divider="blue")
 
     with st.form("login_form"):

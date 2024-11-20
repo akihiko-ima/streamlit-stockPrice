@@ -4,8 +4,8 @@ from PIL import Image
 import io
 
 
-def qrcode_page():
-    # ユーザー名とパスワードの入力フォーム
+def qrcode_page() -> None:
+    """Renders a QR code Generator in a Streamlit application."""
     st.header("QRコード生成", divider="blue")
 
     text_input = st.text_input(
