@@ -1,6 +1,8 @@
 import streamlit as st
 from st_on_hover_tabs import on_hover_tabs
 
+from config import routers
+
 
 def sidebar_component() -> str:
     """
@@ -15,15 +17,8 @@ def sidebar_component() -> str:
     """
     with st.sidebar:
         tabs = on_hover_tabs(
-            tabName=["main", "JapanStock", "Login", "Settings", "QR", "Contact"],
-            iconName=[
-                "home",
-                "radio_button_checked",
-                "login",
-                "settings",
-                "qr_code",
-                "send",
-            ],
+            tabName=[router.routing_name for router in routers.values()],
+            iconName=[router.icon for router in routers.values()],
             styles={
                 "navtab": {
                     "background-color": "#111",

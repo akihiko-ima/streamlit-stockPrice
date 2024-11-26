@@ -4,6 +4,7 @@
 # dir
 env_st_stock
 temp/
+.mypy_cache/
 
 # for python
 __pycache__
