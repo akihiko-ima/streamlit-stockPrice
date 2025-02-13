@@ -1,6 +1,7 @@
 # 環境設定ファイル
 .env
 .secrets.yaml
+secrets.toml
 
 # dir
 env_st_stock
