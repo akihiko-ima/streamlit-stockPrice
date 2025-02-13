@@ -1,9 +1,7 @@
 import streamlit as st
 import yfinance as yf
-import pandas as pd
 import jaconv
 import plotly.graph_objects as go
-from datetime import datetime, timedelta
 from prophet import Prophet
 
 
@@ -37,7 +35,6 @@ def japan_stock_page() -> None:
         # 入力されたティッカーコードを標準化
         ticker = jaconv.z2h(ticker, digit=True, ascii=True).upper() + ".T"
 
-        # 株価データを取得
         stock = yf.Ticker(ticker)
         data = stock.history(period=period)
 
@@ -61,7 +58,6 @@ def japan_stock_page() -> None:
         st.write(f"({ticker}) の過去{period}ear分の株価情報")
         st.dataframe(data)
 
-        # グラフを作成
         fig = go.Figure()
         fig.add_trace(
             go.Scatter(
@@ -77,8 +73,8 @@ def japan_stock_page() -> None:
             xaxis_title="Date",
             yaxis_title="Close Price",
             autosize=False,
-            width=800,  # 横幅を調整
-            height=600,  # 縦幅を調整
+            width=800,
+            height=600,
         )
         st.plotly_chart(fig)
 
@@ -113,7 +109,6 @@ def japan_stock_page() -> None:
                 # 予測結果をセッションステートに保存
                 st.session_state["forecast_data"] = forecast
 
-    # 予測データの表示
     if st.session_state["forecast_data"] is not None:
         forecast = st.session_state["forecast_data"]
         fig_forecast = go.Figure()

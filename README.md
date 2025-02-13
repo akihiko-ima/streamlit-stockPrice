@@ -1,6 +1,6 @@
 ## <div align="center">streamlit による株価分析 app </div>
 
-- Python version 3.11.7
+- Python version 3.11.9
 
 - 仮想環境作成<br>
   => python -m venv env_st_stock

@@ -1,5 +1,6 @@
 # 環境設定ファイル
 .env
+.secrets.yaml
 
 # dir
 env_st_stock

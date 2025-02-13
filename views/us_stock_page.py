@@ -142,8 +142,8 @@ def us_stock_page() -> None:
         controller.set("stock_price_period", period)
 
     with tab2:
-        if st.session_state["login_auth"] == True:
-            st.write("secret page")
+        if st.session_state["authentication_status"] == True:
+            st.info("secret page")
             predict_df = get_stock_data(ticker_list, period)
 
             st.write("#### choice target")
@@ -172,5 +172,5 @@ def us_stock_page() -> None:
 
         else:
             st.info(
-                "This feature requires log in. Please log in on the 'user-auth' page first."
+                "This feature requires log in. Please log in on the 'Login' page first."
             )

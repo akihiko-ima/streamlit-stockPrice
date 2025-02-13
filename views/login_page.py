@@ -1,29 +1,44 @@
 import streamlit as st
-
-from services.auth import Login_authentication
+import streamlit_authenticator as stauth
+import yaml
+from yaml.loader import SafeLoader
 
 
 def login_page() -> None:
     """Renders a login form in a Streamlit application."""
-    st.header("Login", divider="blue")
 
-    with st.form("login_form"):
-        username = st.text_input("Username")
-        password = st.text_input("Password", type="password")
-        submitted = st.form_submit_button(
-            "Login", type="primary", icon=":material/login:"
-        )
+    with open("./.secrets.yaml") as file:
+        config = yaml.load(file, Loader=SafeLoader)
+    # -----------------------------------------------------
+    # Pre-hashing all plain text passwords once
+    # -----------------------------------------------------
+    # stauth.Hasher.hash_passwords(config["credentials"])
+    # with open("./credentials.yml", "w") as file:
+    # yaml.dump(config, file, default_flow_style=False)
 
-        if submitted:
-            auth_result = Login_authentication(
-                target_name=username, valid_pasword=password
-            )
-            st.write(auth_result)
+    authenticator = stauth.Authenticate(
+        config["credentials"],
+        config["cookie"]["name"],
+        config["cookie"]["key"],
+        config["cookie"]["expiry_days"],
+        auto_hash=bool,
+    )
 
-            if isinstance(auth_result, bool) and auth_result:
-                st.success("Login Success")
-                st.balloons()
-                st.session_state["login_auth"] = True
-            elif isinstance(auth_result, str):
-                st.error(auth_result)
-                st.session_state["login_auth"] = False
+    try:
+        auth = authenticator.login("main")
+    except Exception as e:
+        st.error(e)
+
+    # All the authentication info is stored in the session_state
+    if st.session_state["authentication_status"]:
+        authenticator.logout("Logout", "main")
+        st.toast("ログインに成功しました")
+    elif st.session_state["authentication_status"] == False:
+        st.error("Username/password is incorrect")
+        st.stop()
+    elif st.session_state["authentication_status"] == None:
+        st.warning("Please enter your username and password")
+        st.stop()
+
+    st.title(":rocket: Protected Application")
+    st.write(f'Welcome: *{st.session_state["username"]}*')
