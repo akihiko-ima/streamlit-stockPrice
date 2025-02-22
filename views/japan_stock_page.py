@@ -1,12 +1,39 @@
 import streamlit as st
+import pandas as pd
+import io
 import yfinance as yf
 import jaconv
 import plotly.graph_objects as go
 from prophet import Prophet
+from datetime import date
 
 
 def japan_stock_page() -> None:
     """Renders a Japan stock prices in a Streamlit application."""
+
+    def generate_download_csv_file(stock_data: pd.DataFrame, ticker: str) -> tuple[str, bytes]:
+        # filename
+        today = date.today().strftime("%Y%m%d")
+        ticker = ticker.replace(".T", "")
+        download_file_name = f"{today}_{ticker}_stockData.csv"
+
+        # data
+        stock_data = stock_data.reset_index()
+        stock_data["Date"] = pd.to_datetime(stock_data["Date"]).dt.date
+        extracted_column_list = ["Date", "Close"]
+        download_stock_data = stock_data[extracted_column_list]
+
+        # DataFrameをCSV形式の文字列に変換
+        csv_buffer = io.StringIO()
+        download_stock_data.to_csv(csv_buffer, index=False)
+        download_stock_data_string = csv_buffer.getvalue()
+        download_csv_bytes = download_stock_data_string.encode("utf-8")
+
+        return download_file_name, download_csv_bytes
+
+    # --------------------------------------------------
+    # main-component
+    # --------------------------------------------------
     st.header("Japan stock", divider="blue")
 
     if "stock_data" not in st.session_state:
@@ -36,10 +63,10 @@ def japan_stock_page() -> None:
         ticker = jaconv.z2h(ticker, digit=True, ascii=True).upper() + ".T"
 
         stock = yf.Ticker(ticker)
-        data = stock.history(period=period)
+        stock_data = stock.history(period=period)
 
-        if not data.empty:
-            st.session_state["stock_data"] = data
+        if not stock_data.empty:
+            st.session_state["stock_data"] = stock_data
             st.session_state["ticker"] = ticker
             st.session_state["period"] = period
             st.success(f"データを取得しました: {ticker} の過去{period}ear分")
@@ -49,27 +76,43 @@ def japan_stock_page() -> None:
             )
             st.session_state["stock_data"] = None
 
+
     # 株価データが存在する場合の処理
     if st.session_state["stock_data"] is not None:
-        data = st.session_state["stock_data"]
+        stock_data = st.session_state["stock_data"]
         ticker = st.session_state["ticker"]
         period = st.session_state["period"]
 
-        st.write(f"({ticker}) の過去{period}ear分の株価情報")
-        st.dataframe(data)
+        with st.expander("取得したデータをダウンロードしますか？", icon=":material/download:"):
+            st.write("ダウンロードされるファイルは、")
+            st.markdown("**`{ダウンロード日}_{証券コード}.csv`** で保存されます。")
+
+            download_file_name, download_csv_bytes = generate_download_csv_file(stock_data=stock_data, ticker=ticker)
+
+            st.download_button(
+                label="📥 データをダウンロード (CSV)",
+                data=download_csv_bytes,
+                file_name=download_file_name,
+                mime="text/csv",
+                key="download_csv",
+                type="secondary",
+            )
+
+        st.write(f"({ticker}) の過去 {period}earの株価情報")
+        st.dataframe(stock_data)
 
         fig = go.Figure()
         fig.add_trace(
             go.Scatter(
-                x=data.index,
-                y=data["Close"],
+                x=stock_data.index,
+                y=stock_data["Close"],
                 mode="lines",
                 name="Close",
                 line={"color": "#FFA07A", "width": 2},
             )
         )
         fig.update_layout(
-            title=f"{ticker} の過去{period}ear分の株価",
+            title=f"{ticker} の過去 {period}earの株価",
             xaxis_title="Date",
             yaxis_title="Close Price",
             autosize=False,
@@ -92,13 +135,10 @@ def japan_stock_page() -> None:
                 icon=":material/trending_up:",
             ):
                 # Prophet の入力データの準備
-                forecast_data = data.reset_index()[["Date", "Close"]]
+                forecast_data = stock_data.reset_index()[["Date", "Close"]]
                 forecast_data.rename(columns={"Date": "ds", "Close": "y"}, inplace=True)
-
-                # タイムゾーン情報を削除
                 forecast_data["ds"] = forecast_data["ds"].dt.tz_localize(None)
 
-                # モデルの作成と予測
                 model = Prophet()
                 model.fit(forecast_data)
 
@@ -106,7 +146,6 @@ def japan_stock_page() -> None:
                 future = model.make_future_dataframe(periods=60)
                 forecast = model.predict(future)
 
-                # 予測結果をセッションステートに保存
                 st.session_state["forecast_data"] = forecast
 
     if st.session_state["forecast_data"] is not None:
@@ -123,8 +162,8 @@ def japan_stock_page() -> None:
         )
         fig_forecast.add_trace(
             go.Scatter(
-                x=data.index,
-                y=data["Close"],
+                x=stock_data.index,
+                y=stock_data["Close"],
                 mode="lines",
                 name="Historical Close",
                 line={"color": "#FFA07A", "width": 2},
