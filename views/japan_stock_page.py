@@ -11,7 +11,9 @@ from datetime import date
 def japan_stock_page() -> None:
     """Renders a Japan stock prices in a Streamlit application."""
 
-    def generate_download_csv_file(stock_data: pd.DataFrame, ticker: str) -> tuple[str, bytes]:
+    def generate_download_csv_file(
+        stock_data: pd.DataFrame, ticker: str
+    ) -> tuple[str, bytes]:
         # filename
         today = date.today().strftime("%Y%m%d")
         ticker = ticker.replace(".T", "")
@@ -76,18 +78,21 @@ def japan_stock_page() -> None:
             )
             st.session_state["stock_data"] = None
 
-
     # 株価データが存在する場合の処理
     if st.session_state["stock_data"] is not None:
         stock_data = st.session_state["stock_data"]
         ticker = st.session_state["ticker"]
         period = st.session_state["period"]
 
-        with st.expander("取得したデータをダウンロードしますか？", icon=":material/download:"):
+        with st.expander(
+            "取得したデータをダウンロードしますか？", icon=":material/download:"
+        ):
             st.write("ダウンロードされるファイルは、")
             st.markdown("**`{ダウンロード日}_{証券コード}.csv`** で保存されます。")
 
-            download_file_name, download_csv_bytes = generate_download_csv_file(stock_data=stock_data, ticker=ticker)
+            download_file_name, download_csv_bytes = generate_download_csv_file(
+                stock_data=stock_data, ticker=ticker
+            )
 
             st.download_button(
                 label="📥 データをダウンロード (CSV)",

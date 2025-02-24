@@ -5,8 +5,12 @@ secrets.toml
 
 # dir
 env_st_stock
-temp/
 .mypy_cache/
+temp/
+data/
+
+# file
+db.json
 
 # for python
 __pycache__
