@@ -9,6 +9,8 @@ from prophet import Prophet
 from prophet.plot import plot_plotly
 from typing import List
 
+from services.StockAnalyzer import StockAnalyzer
+
 
 def us_stock_page() -> None:
     """Renders a USA stock prices in a Streamlit application."""
@@ -57,6 +59,19 @@ def us_stock_page() -> None:
         return df
 
     with tab1:
+        st.markdown("## :mag: Performance")
+        st.caption("直近の株価のパフォーマンス")
+
+        vti_performance = StockAnalyzer("VTI")
+        vti_performance.display(title="株価データ 1")
+
+        vea_performance = StockAnalyzer("VEA")
+        vea_performance.display(title="株価データ 2")
+
+        net_performance = StockAnalyzer("NET")
+        net_performance.display(title="株価データ 3")
+
+        st.markdown("## :chart_with_upwards_trend: Chart")
         cookies = controller.getAll()
         period_options = [
             "1d",
@@ -86,28 +101,35 @@ def us_stock_page() -> None:
                 ":calendar: Period", period_options, index=period_options.index(period)
             )
 
-        ymin, ymax = st.slider(":chart_with_upwards_trend: Scale ", 0, 3000, (0, 500))
-
-        st.write("#### Company Selection")
         if "ticker_list" in cookies and cookies["ticker_list"] is not None:
             ticker_list = cookies["ticker_list"]
         else:
-            ticker_list = ["VT", "VTI", "VEA", "VWO", "KO", "TSM"]
+            ticker_list = [
+                "VT",
+                "VTI",
+                "VEA",
+                "VWO",
+                "NET",
+                "KO",
+                "TSM",
+            ]
 
         df = get_stock_data(ticker_list, period)
 
         companies = st.multiselect(
             "Company Selection",
             list(df.index),
-            ticker_list[:3],
+            ticker_list[:5],
         )
         if not companies:
             st.error("一社は選択してください。")
         else:
             data = df.loc[companies]
-            st.write("#### StockPrice(USD)", data)
+            st.write("##### StockPrice(USD)", data)
             df = df.T.reset_index()
             fig1 = make_subplots(rows=1, cols=1)
+
+        ymin, ymax = st.slider(":chart_with_upwards_trend: Scale ", 0, 3000, (0, 500))
 
         for company in companies:
             fig1.add_trace(
