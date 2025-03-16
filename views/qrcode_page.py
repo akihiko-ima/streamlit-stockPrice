@@ -41,13 +41,15 @@ def qrcode_page() -> None:
             img.save(buffer, format="PNG")
             buffer.seek(0)
 
-            st.image(
+            _, col, _ = st.columns([2, 2, 2])
+
+            col.image(
                 Image.open(buffer),
                 caption="生成されたQRコード",
                 use_container_width=True,
             )
 
-            st.download_button(
+            col.download_button(
                 label="QRコードをダウンロード",
                 data=buffer,
                 file_name="qrcode.png",
