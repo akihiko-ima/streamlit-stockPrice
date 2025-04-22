@@ -3,14 +3,17 @@
 - Python version 3.11.9
 
 - 仮想環境作成<br>
-  => python -m venv env_st_stock
+  => uv init .<br>
 
 - 仮想環境起動<br>
-  => .\/env_st_stock/Scripts/activate
+  => uv sync<br>
 
 - requirements.txt<br>
-  pip install -r requirements.txt<br>
-  pip freeze > requirements.txt
+  uv add -r requirements.txt<br>
+  uv pip freeze > requirements.txt<br>
+
+- upgrade<br>
+ uv pip install -U "(package)" <br>
 
 #### Icon for sidebar
 
@@ -18,7 +21,7 @@
 
 #### アプリの実行
 
-- streamlit run app.py
+- uv run streamlit run src/app.py
 
 ## <div align="center">streamlit-cloud で公開中 🚀 NEW</div>
 

@@ -4,6 +4,7 @@
 secrets.toml
 
 # dir
+.venv
 env_st_stock
 .mypy_cache/
 temp/
