@@ -81,6 +81,7 @@ def initialize_setting():
 
     if not st.session_state.is_initialized:
         DATA_PATH = os.getenv("DATA_PATH")
+        DATA_PATH = os.path.join(os.path.dirname(__file__), "..", DATA_PATH)
 
         if DATA_PATH and not os.path.exists(DATA_PATH):
             os.makedirs(DATA_PATH)
