@@ -1,7 +1,9 @@
+import time
 import streamlit as st
 import yfinance as yf
 from streamlit_extras.metric_cards import style_metric_cards
 from dataclasses import dataclass
+from yfinance.exceptions import YFRateLimitError
 
 
 @dataclass
@@ -18,14 +20,29 @@ class StockAnalyzer:
     """株価データを取得し、変化量と変化率を計算し、Streamlitで表示するクラス"""
 
     def __init__(self, ticker: str):
-        """初期化: ティッカーシンボルを設定し、データを取得"""
         self.ticker = ticker
-        self.data = self._get_stock_volatility()
+        self.data = self._get_stock_volatility_with_cache(ticker)
 
-    def _get_stock_volatility(self) -> StockVolatility:
-        """Yahoo Finance から株価データを取得し、変化量と変化率を計算"""
-        stock = yf.Ticker(self.ticker)
-        hist = stock.history(period="1y")
+    @st.cache_data(show_spinner="📈 株価データを取得中...")
+    def _get_stock_volatility_with_cache(self, ticker: str) -> StockVolatility:
+        """キャッシュ付き株価データ取得＆変化率計算"""
+        retries = 3
+        delay = 1
+
+        for i in range(retries):
+            try:
+                stock = yf.Ticker(ticker)
+                hist = stock.history(period="1y")
+                break
+            except YFRateLimitError:
+                if i < retries - 1:
+                    time.sleep(delay)
+                    delay *= 2
+                else:
+                    st.error(
+                        "❌ Yahoo Finance のレートリミットに達しました。後ほど再試行してください。"
+                    )
+                    return StockVolatility(None, None, None, None, None, None)
 
         if hist.empty:
             return StockVolatility(None, None, None, None, None, None)
@@ -55,7 +72,7 @@ class StockAnalyzer:
         st.write(f"##### {title}: {self.ticker}")
 
         if self.data.weekly_change_value is None:
-            st.error("❌ 無効なティッカー or データなし")
+            st.error("❌ 無効なティッカー or データ取得に失敗")
         else:
             col1, col2, col3 = st.columns(3)
 
