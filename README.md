@@ -13,7 +13,7 @@
   uv pip freeze > requirements.txt<br>
 
 - upgrade<br>
- uv pip install -U "(package)" <br>
+ uv pip install --upgrade "(package)" <br>
 
 #### Icon for sidebar
 
