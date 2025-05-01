@@ -9,8 +9,6 @@ from prophet import Prophet
 from prophet.plot import plot_plotly
 from typing import List
 
-from services.StockAnalyzer import StockAnalyzer
-
 
 def us_stock_page() -> None:
     """Renders a USA stock prices in a Streamlit application."""
@@ -59,19 +57,8 @@ def us_stock_page() -> None:
         return df
 
     with tab1:
-        st.markdown("## :mag: Performance")
-        st.caption("直近の株価のパフォーマンス")
-
-        vti_performance = StockAnalyzer("VTI")
-        vti_performance.display(title="株価データ 1")
-
-        vea_performance = StockAnalyzer("VEA")
-        vea_performance.display(title="株価データ 2")
-
-        net_performance = StockAnalyzer("NET")
-        net_performance.display(title="株価データ 3")
-
         st.markdown("## :chart_with_upwards_trend: Chart")
+        st.caption("直近の株価のパフォーマンス")
         cookies = controller.getAll()
         period_options = [
             "1d",
