@@ -4,7 +4,7 @@ from datetime import datetime
 from contextlib import contextmanager
 from dotenv import load_dotenv
 
-load_dotenv(os.path.join(os.path.dirname(__file__),"..", "..", ".env"))
+load_dotenv()
 DB_PATH = os.getenv("DB_PATH")
 
 

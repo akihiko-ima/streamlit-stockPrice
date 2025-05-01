@@ -69,7 +69,7 @@ def initialize_setting():
     Raises:
         OSError: ディレクトリの作成に失敗した場合に発生します。
     """
-    load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"))
+    load_dotenv()
 
     # for authentication
     if "authentication_status" not in st.session_state:

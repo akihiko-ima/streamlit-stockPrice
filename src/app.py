@@ -1,13 +1,11 @@
 # Streamlit 株価表示アプリ
 import os
-import sys
 import streamlit as st
-from pathlib import Path
-sys.path.append(str(Path(__file__).resolve().parent))
 
 from config import initialize_setting
 from components.sidebar import sidebar_component
 from router import router_mappings
+
 
 st.set_page_config(
     page_title="Stock-imaima",
